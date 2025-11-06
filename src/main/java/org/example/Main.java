@@ -12,6 +12,7 @@ import org.example.entity.Vehicle;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -254,7 +255,8 @@ public class Main {
 
         System.out.print("Departure date (yyyy-MM-dd HH:mm): ");
         System.out.flush();
-        LocalDateTime departureDate = LocalDateTime.parse(reader.readLine().trim() + ":00");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime departureDate = LocalDateTime.parse(reader.readLine().trim(), formatter);
 
         System.out.print("Price: ");
         System.out.flush();
