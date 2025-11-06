@@ -117,6 +117,14 @@ public class EmployeeDAO {
         }
     }
 
+    /**
+     * Overloaded method for backward compatibility.
+     * Finds all available drivers for a given time period without qualification filtering or pagination.
+     */
+    public static List<TransportEmployee> getAvailableDrivers(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
+        return getAvailableDrivers(startDate, endDate, null, null);
+    }
+
     public static List<TransportEmployee> searchEmployeesByName(String namePattern) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
@@ -131,22 +139,72 @@ public class EmployeeDAO {
         }
     }
 
-    public static List<TransportEmployee> getAvailableDrivers(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
+    /**
+     * Find available drivers for a given time period who have appropriate qualifications.
+     * This method checks:
+     * 1. Driver is not assigned to any transport during the specified period
+     * 2. Driver has valid qualifications
+     * 3. Driver belongs to an active company
+     *
+     * @param startDate The start date-time of the period (inclusive)
+     * @param endDate The end date-time of the period (inclusive)
+     * @param requiredQualificationId Optional qualification ID that the driver must have
+     * @param maxResults Maximum number of results to return (for pagination)
+     * @return List of available drivers
+     * @throws IllegalArgumentException if startDate is after endDate or dates are null
+     */
+    public static List<TransportEmployee> getAvailableDrivers(
+            java.time.LocalDateTime startDate,
+            java.time.LocalDateTime endDate,
+            Long requiredQualificationId,
+            Integer maxResults) {
+        
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Start date and end date must not be null");
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date must not be after end date");
+        }
+
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            // Find drivers that don't have any transports scheduled in the given time period
+            
+            // Improved query to handle overlapping transports and check qualifications
             String hql = """
-                FROM TransportEmployee e
-                WHERE e NOT IN (
+                SELECT DISTINCT e FROM TransportEmployee e
+                LEFT JOIN e.qualifications q
+                WHERE e.company.active = true
+                AND e NOT IN (
                     SELECT DISTINCT t.driver
                     FROM Transport t
-                    WHERE (t.departureDate BETWEEN :startDate AND :endDate)
-                    OR (t.arrivalDate BETWEEN :startDate AND :endDate)
+                    WHERE (
+                        (t.departureDate <= :endDate AND t.arrivalDate >= :startDate)
+                        OR (t.departureDate BETWEEN :startDate AND :endDate)
+                        OR (t.arrivalDate BETWEEN :startDate AND :endDate)
+                    )
                 )
                 """;
+
+            // Add qualification filter if required
+            if (requiredQualificationId != null) {
+                hql += " AND :qualificationId IN (SELECT q.id FROM e.qualifications q)";
+            }
+            
+            hql += " ORDER BY e.name"; // Add ordering for consistency
+
             Query<TransportEmployee> query = session.createQuery(hql, TransportEmployee.class);
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
+            
+            if (requiredQualificationId != null) {
+                query.setParameter("qualificationId", requiredQualificationId);
+            }
+
+            // Set max results if specified
+            if (maxResults != null && maxResults > 0) {
+                query.setMaxResults(maxResults);
+            }
+
             List<TransportEmployee> availableDrivers = query.getResultList();
             transaction.commit();
             return availableDrivers;

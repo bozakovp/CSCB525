@@ -116,9 +116,7 @@ public class Main {
     }
 
     private static void editCompany(BufferedReader reader) throws IOException {
-        System.out.print("Company id: ");
-        System.out.flush();
-        long id = Long.parseLong(reader.readLine().trim());
+        long id = readId(reader, "Company id: ");
         TransportCompany company = TransportCompanyDAO.getCompanyById(id);
         if (company == null) {
             System.out.println("Company not found");
@@ -133,9 +131,7 @@ public class Main {
     }
 
     private static void deleteCompany(BufferedReader reader) throws IOException {
-        System.out.print("Company id: ");
-        System.out.flush();
-        long id = Long.parseLong(reader.readLine().trim());
+        long id = readId(reader, "Company id: ");
         TransportCompany company = TransportCompanyDAO.getCompanyById(id);
         if (company == null) {
             System.out.println("Company not found");
@@ -156,9 +152,7 @@ public class Main {
 
     // Vehicle handlers
     private static void createVehicle(BufferedReader reader) throws IOException {
-        System.out.print("Company id: ");
-        System.out.flush();
-        long companyId = Long.parseLong(reader.readLine().trim());
+        long companyId = readId(reader, "Company id: ");
         TransportCompany company = TransportCompanyDAO.getCompanyById(companyId);
         if (company == null) { System.out.println("Company not found"); return; }
         System.out.print("Vehicle type: ");
@@ -172,9 +166,7 @@ public class Main {
     }
 
     private static void editVehicle(BufferedReader reader) throws IOException {
-        System.out.print("Vehicle id: ");
-        System.out.flush();
-        long id = Long.parseLong(reader.readLine().trim());
+        long id = readId(reader, "Vehicle id: ");
         Vehicle vehicle = VehicleDAO.getVehicleById(id);
         if (vehicle == null) { System.out.println("Vehicle not found"); return; }
         System.out.print("New type (current: " + vehicle.getType() + "): ");
@@ -186,9 +178,7 @@ public class Main {
     }
 
     private static void deleteVehicle(BufferedReader reader) throws IOException {
-        System.out.print("Vehicle id: ");
-        System.out.flush();
-        long id = Long.parseLong(reader.readLine().trim());
+        long id = readId(reader, "Vehicle id: ");
         Vehicle vehicle = VehicleDAO.getVehicleById(id);
         if (vehicle == null) { System.out.println("Vehicle not found"); return; }
         VehicleDAO.deleteVehicle(vehicle);
@@ -196,9 +186,7 @@ public class Main {
     }
 
     private static void listVehiclesByCompany(BufferedReader reader) throws IOException {
-        System.out.print("Company id: ");
-        System.out.flush();
-        long companyId = Long.parseLong(reader.readLine().trim());
+        long companyId = readId(reader, "Company id: ");
         List<Vehicle> vehicles = VehicleDAO.getVehiclesByCompany(companyId);
         if (vehicles.isEmpty()) { System.out.println("No vehicles found"); return; }
         vehicles.forEach(v -> System.out.println(v.getId() + " - " + v.getType()));
@@ -206,9 +194,7 @@ public class Main {
 
     // Employee handlers
     private static void createEmployee(BufferedReader reader) throws IOException {
-        System.out.print("Company id: ");
-        System.out.flush();
-        long companyId = Long.parseLong(reader.readLine().trim());
+        long companyId = readId(reader, "Company id: ");
         TransportCompany company = TransportCompanyDAO.getCompanyById(companyId);
         if (company == null) { System.out.println("Company not found"); return; }
         System.out.print("Employee name: ");
@@ -222,9 +208,7 @@ public class Main {
     }
 
     private static void editEmployee(BufferedReader reader) throws IOException {
-        System.out.print("Employee id: ");
-        System.out.flush();
-        long id = Long.parseLong(reader.readLine().trim());
+        long id = readId(reader, "Employee id: ");
         TransportEmployee employee = EmployeeDAO.getEmployeeById(id);
         if (employee == null) { System.out.println("Employee not found"); return; }
         System.out.print("New name (current: " + employee.getName() + "): ");
@@ -236,9 +220,7 @@ public class Main {
     }
 
     private static void deleteEmployee(BufferedReader reader) throws IOException {
-        System.out.print("Employee id: ");
-        System.out.flush();
-        long id = Long.parseLong(reader.readLine().trim());
+        long id = readId(reader, "Employee id: ");
         TransportEmployee employee = EmployeeDAO.getEmployeeById(id);
         if (employee == null) { System.out.println("Employee not found"); return; }
         EmployeeDAO.deleteEmployee(employee);
@@ -246,9 +228,7 @@ public class Main {
     }
 
     private static void listEmployeesByCompany(BufferedReader reader) throws IOException {
-        System.out.print("Company id: ");
-        System.out.flush();
-        long companyId = Long.parseLong(reader.readLine().trim());
+        long companyId = readId(reader, "Company id: ");
         List<TransportEmployee> employees = EmployeeDAO.getEmployeesByCompany(companyId);
         if (employees.isEmpty()) { System.out.println("No employees found"); return; }
         employees.forEach(e -> System.out.println(e.getId() + " - " + e.getName()));
@@ -256,15 +236,11 @@ public class Main {
 
     // Transport handlers
     private static void createTransport(BufferedReader reader) throws IOException {
-        System.out.print("Vehicle id: ");
-        System.out.flush();
-        long vehicleId = Long.parseLong(reader.readLine().trim());
+        long vehicleId = readId(reader, "Vehicle id: ");
         Vehicle vehicle = VehicleDAO.getVehicleById(vehicleId);
         if (vehicle == null) { System.out.println("Vehicle not found"); return; }
 
-        System.out.print("Driver id: ");
-        System.out.flush();
-        long driverId = Long.parseLong(reader.readLine().trim());
+        long driverId = readId(reader, "Driver id: ");
         TransportEmployee driver = EmployeeDAO.getEmployeeById(driverId);
         if (driver == null) { System.out.println("Driver not found"); return; }
 
@@ -307,13 +283,23 @@ public class Main {
     }
 
     private static void exportTransports(BufferedReader reader) throws IOException {
-        System.out.print("Company id: ");
-        System.out.flush();
-        long companyId = Long.parseLong(reader.readLine().trim());
+        long companyId = readId(reader, "Company id: ");
         List<Transport> transports = TransportDAO.getTransportsByCompany(companyId);
         if (transports.isEmpty()) { System.out.println("No transports found"); return; }
         TransportDAO.exportTransportsToCSV(transports, "transports.csv");
         System.out.println("Exported transports to transports.csv");
+    }
+
+    private static long readId(BufferedReader reader, String prompt) throws IOException {
+        while (true) {
+            System.out.print(prompt);
+            System.out.flush();
+            String input = reader.readLine().trim();
+            if (input.matches("\\d+")) {
+                return Long.parseLong(input);
+            }
+            System.out.println("Warning: Please enter a valid number.");
+        }
     }
 
     private static class InputEndedException extends RuntimeException {}
