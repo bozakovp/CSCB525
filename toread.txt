@@ -1,0 +1,51 @@
+> Task :run
+Hello world!
+[INFO ] 2025-11-05 18:51:00.179 [main] Version - HHH000412: Hibernate ORM core version 5.6.15.Final
+[INFO ] 2025-11-05 18:51:00.180 [main] Environment - HHH000205: Loaded properties from resource hibernate.properties: {hibernate.connection.driver_class=com.mysql.cj.jdbc.Driver, hibernate.dialect.storage_engine=innodb, hibernate.hbm2ddl.auto=update, hibernate.dialect=org.hibernate.dialect.MySQL5Dialect, hibernate.connection.password=****, hibernate.connection.username=root, hibernate.connection.url=jdbc:mysql://localhost:3306/transport_company?createDatabaseIfNotExist=true&useSSL=true&serverTimezone=Europe/Sofia, hibernate.bytecode.use_reflection_optimizer=false, hibernate.show_sql=true}
+[INFO ] 2025-11-05 18:51:00.244 [main] Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+[WARN ] 2025-11-05 18:51:00.274 [main] pooling - HHH10001002: Using Hibernate built-in connection pool (not for production use!)
+[INFO ] 2025-11-05 18:51:00.275 [main] pooling - HHH10001005: using driver [com.mysql.cj.jdbc.Driver] at URL [jdbc:mysql://localhost:3306/transport_company?createDatabaseIfNotExist=true&useSSL=true&serverTimezone=Europe/Sofia]
+[INFO ] 2025-11-05 18:51:00.275 [main] pooling - HHH10001001: Connection properties: {password=****, user=root}
+[INFO ] 2025-11-05 18:51:00.276 [main] pooling - HHH10001003: Autocommit mode: false
+[INFO ] 2025-11-05 18:51:00.276 [main] DriverManagerConnectionProviderImpl - HHH000115: Hibernate connection pool size: 20 (min=1)
+[INFO ] 2025-11-05 18:51:00.435 [main] Dialect - HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+[INFO ] 2025-11-05 18:51:00.641 [main] access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@4087c7fc] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+[DEBUG] 2025-11-05 18:51:00.657 [main] SQL - create table company (CompanyID bigint not null auto_increment, Name varchar(255) not null, primary key (CompanyID)) engine=InnoDB
+Hibernate: create table company (CompanyID bigint not null auto_increment, Name varchar(255) not null, primary key (CompanyID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.666 [main] SQL - create table EmployeeQualifications (EmployeeID bigint not null, QualificationID bigint not null, primary key (EmployeeID, QualificationID)) engine=InnoDB
+Hibernate: create table EmployeeQualifications (EmployeeID bigint not null, QualificationID bigint not null, primary key (EmployeeID, QualificationID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.671 [main] SQL - create table Employees (EmployeeID bigint not null auto_increment, Name varchar(255) not null, CompanyID bigint not null, primary key (EmployeeID)) engine=InnoDB
+Hibernate: create table Employees (EmployeeID bigint not null auto_increment, Name varchar(255) not null, CompanyID bigint not null, primary key (EmployeeID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.675 [main] SQL - create table Qualifications (QualificationID bigint not null auto_increment, Description varchar(255), Name varchar(255) not null, primary key (QualificationID)) engine=InnoDB
+Hibernate: create table Qualifications (QualificationID bigint not null auto_increment, Description varchar(255), Name varchar(255) not null, primary key (QualificationID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.679 [main] SQL - create table Transports (TransportID bigint not null auto_increment, ArrivalDate datetime, CargoWeight float, DepartureDate datetime not null, EndPoint varchar(255) not null, Price decimal(10,2) not null, StartPoint varchar(255) not null, DriverID bigint not null, TransportTypeID bigint not null, VehicleID bigint not null, primary key (TransportID)) engine=InnoDB
+Hibernate: create table Transports (TransportID bigint not null auto_increment, ArrivalDate datetime, CargoWeight float, DepartureDate datetime not null, EndPoint varchar(255) not null, Price decimal(10,2) not null, StartPoint varchar(255) not null, DriverID bigint not null, TransportTypeID bigint not null, VehicleID bigint not null, primary key (TransportID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.683 [main] SQL - create table TransportTypeQualifications (TransportTypeID bigint not null, QualificationID bigint not null, primary key (TransportTypeID, QualificationID)) engine=InnoDB
+Hibernate: create table TransportTypeQualifications (TransportTypeID bigint not null, QualificationID bigint not null, primary key (TransportTypeID, QualificationID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.686 [main] SQL - create table TransportTypes (TransportTypeID bigint not null auto_increment, Description varchar(255), Name varchar(255) not null, primary key (TransportTypeID)) engine=InnoDB
+Hibernate: create table TransportTypes (TransportTypeID bigint not null auto_increment, Description varchar(255), Name varchar(255) not null, primary key (TransportTypeID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.687 [main] SQL - create table Vehicles (VehicleID bigint not null auto_increment, Type varchar(255) not null, CompanyID bigint not null, primary key (VehicleID)) engine=InnoDB
+Hibernate: create table Vehicles (VehicleID bigint not null auto_increment, Type varchar(255) not null, CompanyID bigint not null, primary key (VehicleID)) engine=InnoDB
+[DEBUG] 2025-11-05 18:51:00.690 [main] SQL - alter table Qualifications drop index UK_qgt9sm1s71pqjpuhcflutrdgi
+Hibernate: alter table Qualifications drop index UK_qgt9sm1s71pqjpuhcflutrdgi
+[DEBUG] 2025-11-05 18:51:00.694 [main] SQL - alter table Qualifications add constraint UK_qgt9sm1s71pqjpuhcflutrdgi unique (Name)
+Hibernate: alter table Qualifications add constraint UK_qgt9sm1s71pqjpuhcflutrdgi unique (Name)
+[DEBUG] 2025-11-05 18:51:00.697 [main] SQL - alter table EmployeeQualifications add constraint FKl4418ef0ksatlo77x4n64bplb foreign key (QualificationID) references Qualifications (QualificationID)
+Hibernate: alter table EmployeeQualifications add constraint FKl4418ef0ksatlo77x4n64bplb foreign key (QualificationID) references Qualifications (QualificationID)
+[DEBUG] 2025-11-05 18:51:00.703 [main] SQL - alter table EmployeeQualifications add constraint FKmqn17ftodgkrkdjupy03d1sud foreign key (EmployeeID) references Employees (EmployeeID)
+Hibernate: alter table EmployeeQualifications add constraint FKmqn17ftodgkrkdjupy03d1sud foreign key (EmployeeID) references Employees (EmployeeID)
+[DEBUG] 2025-11-05 18:51:00.708 [main] SQL - alter table Employees add constraint FKntdokyro516ydsgjoit9i42h1 foreign key (CompanyID) references company (CompanyID)
+Hibernate: alter table Employees add constraint FKntdokyro516ydsgjoit9i42h1 foreign key (CompanyID) references company (CompanyID)
+[DEBUG] 2025-11-05 18:51:00.715 [main] SQL - alter table Transports add constraint FK6128wj623wnq70xmhyd66vvjs foreign key (DriverID) references Employees (EmployeeID)
+Hibernate: alter table Transports add constraint FK6128wj623wnq70xmhyd66vvjs foreign key (DriverID) references Employees (EmployeeID)
+[DEBUG] 2025-11-05 18:51:00.720 [main] SQL - alter table Transports add constraint FKsslm0o0r3j5qmd6l9uralhbfu foreign key (TransportTypeID) references TransportTypes (TransportTypeID)
+Hibernate: alter table Transports add constraint FKsslm0o0r3j5qmd6l9uralhbfu foreign key (TransportTypeID) references TransportTypes (TransportTypeID)
+[DEBUG] 2025-11-05 18:51:00.726 [main] SQL - alter table Transports add constraint FKq2ytx8c3jt5i2saw2bgx6afme foreign key (VehicleID) references Vehicles (VehicleID)
+Hibernate: alter table Transports add constraint FKq2ytx8c3jt5i2saw2bgx6afme foreign key (VehicleID) references Vehicles (VehicleID)
+[DEBUG] 2025-11-05 18:51:00.734 [main] SQL - alter table TransportTypeQualifications add constraint FK54dryja38dkj00ufo4xklnhem foreign key (QualificationID) references Qualifications (QualificationID)
+Hibernate: alter table TransportTypeQualifications add constraint FK54dryja38dkj00ufo4xklnhem foreign key (QualificationID) references Qualifications (QualificationID)
+[DEBUG] 2025-11-05 18:51:00.738 [main] SQL - alter table TransportTypeQualifications add constraint FK9a38x5r4xkwy6t2vnu63l0ou4 foreign key (TransportTypeID) references TransportTypes (TransportTypeID)
+Hibernate: alter table TransportTypeQualifications add constraint FK9a38x5r4xkwy6t2vnu63l0ou4 foreign key (TransportTypeID) references TransportTypes (TransportTypeID)
+[DEBUG] 2025-11-05 18:51:00.743 [main] SQL - alter table Vehicles add constraint FK6mbvuynkg05q8i6ocvsfh9fn9 foreign key (CompanyID) references company (CompanyID)
+Hibernate: alter table Vehicles add constraint FK6mbvuynkg05q8i6ocvsfh9fn9 foreign key (CompanyID) references company (CompanyID)
+[INFO ] 2025-11-05 18:51:00.751 [main] JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
