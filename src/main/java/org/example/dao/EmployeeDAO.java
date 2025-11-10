@@ -28,6 +28,22 @@ public class EmployeeDAO {
         }
     }
 
+    public static TransportEmployee getEmployeeByIdWithQualifications(long id) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Query<TransportEmployee> query = session.createQuery(
+                "SELECT DISTINCT e FROM TransportEmployee e " +
+                "LEFT JOIN FETCH e.qualifications " +
+                "WHERE e.id = :id",
+                TransportEmployee.class
+            );
+            query.setParameter("id", id);
+            TransportEmployee employee = query.uniqueResultOptional().orElse(null);
+            transaction.commit();
+            return employee;
+        }
+    }
+
     public static List<TransportEmployee> getEmployees() {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
