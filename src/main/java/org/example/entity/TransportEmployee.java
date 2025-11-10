@@ -1,12 +1,16 @@
 package org.example.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "Employees")
-public class Employee {
+public class TransportEmployee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EmployeeID")
@@ -14,7 +18,7 @@ public class Employee {
 
     @ManyToOne
     @JoinColumn(name = "CompanyID", nullable = false)
-    private TransportCompanies company;
+    private TransportCompany company;
 
     @Column(name = "Name", nullable = false, length = 255)
     private String name;
@@ -30,5 +34,5 @@ public class Employee {
     @OneToMany(mappedBy = "driver")
     private Set<Transport> transports = new HashSet<>();
 
-    public Employee() {}
+    public TransportEmployee() {}
 }

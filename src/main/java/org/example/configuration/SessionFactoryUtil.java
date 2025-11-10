@@ -1,7 +1,7 @@
 package org.example.configuration;
 
-import org.example.entity.TransportCompanies;
-import org.example.entity.Employee;
+import org.example.entity.TransportCompany;
+import org.example.entity.TransportEmployee;
 import org.example.entity.Vehicle;
 import org.example.entity.TransportType;
 import org.example.entity.Transport;
@@ -16,8 +16,8 @@ public class SessionFactoryUtil {
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             Configuration configuration = new Configuration();
-            configuration.addAnnotatedClass(TransportCompanies.class);
-            configuration.addAnnotatedClass(Employee.class);
+            configuration.addAnnotatedClass(TransportCompany.class);
+            configuration.addAnnotatedClass(TransportEmployee.class);
             configuration.addAnnotatedClass(Vehicle.class);
             configuration.addAnnotatedClass(TransportType.class);
             configuration.addAnnotatedClass(Transport.class);

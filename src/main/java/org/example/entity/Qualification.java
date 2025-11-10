@@ -1,9 +1,13 @@
 package org.example.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "Qualifications")
 public class Qualification {
@@ -19,7 +23,7 @@ public class Qualification {
     private String description;
 
     @ManyToMany(mappedBy = "qualifications")
-    private Set<Employee> employees = new HashSet<>();
+    private Set<TransportEmployee> employees = new HashSet<>();
 
     @ManyToMany(mappedBy = "requiredQualifications")
     private Set<TransportType> transportTypes = new HashSet<>();

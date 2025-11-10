@@ -1,14 +1,14 @@
 package org.example.dao;
 
 import org.example.configuration.SessionFactoryUtil;
-import org.example.entity.TransportCompanies;
+import org.example.entity.TransportCompany;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
 public class ExampleDao {
-    public static void saveCompany(TransportCompanies company) {
+    public static void saveCompany(TransportCompany company) {
        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
            Transaction transaction = session.beginTransaction();
            session.save(company);
@@ -16,36 +16,36 @@ public class ExampleDao {
        }
     }
 
-    public static void createCompany(TransportCompanies company) {
+    public static void createCompany(TransportCompany company) {
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(company);
             transaction.commit();
         }
     }
-    public static TransportCompanies getCompanyById(long id) {
-        TransportCompanies company;
+    public static TransportCompany getCompanyById(long id) {
+        TransportCompany company;
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            company = session.get(TransportCompanies.class, id);
+            company = session.get(TransportCompany.class, id);
             transaction.commit();
         }
         return company;
     }
 
-    public static List<TransportCompanies> getCompanies() {
-        List<TransportCompanies> companies;
+    public static List<TransportCompany> getCompanies() {
+        List<TransportCompany> companies;
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            companies = session
-                    .createQuery("Select c From Company c", TransportCompanies.class)
+        companies = session
+            .createQuery("FROM TransportCompany", TransportCompany.class)
                     .getResultList();
             transaction.commit();
         }
         return companies;
     }
 
-    public static void updateCompany(TransportCompanies company) {
+    public static void updateCompany(TransportCompany company) {
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.saveOrUpdate(company);
@@ -53,7 +53,7 @@ public class ExampleDao {
         }
     }
 
-    public static void deleteCompany(TransportCompanies company) {
+    public static void deleteCompany(TransportCompany company) {
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.delete(company);

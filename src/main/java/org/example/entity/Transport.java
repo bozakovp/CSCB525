@@ -1,9 +1,13 @@
 package org.example.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "Transports")
 public class Transport {
@@ -18,7 +22,7 @@ public class Transport {
 
     @ManyToOne
     @JoinColumn(name = "DriverID", nullable = false)
-    private Employee driver;
+    private TransportEmployee driver;
 
     @ManyToOne
     @JoinColumn(name = "TransportTypeID", nullable = false)

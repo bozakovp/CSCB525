@@ -12,13 +12,13 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="org.hibernate.SQL" level="debug" additivity="false">
+        <Logger name="org.hibernate.SQL" level="info" additivity="false">
             <AppenderRef ref="Console-Appender"/>
         </Logger>
-        <Logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">
+        <Logger name="org.hibernate.type.descriptor.sql" level="info" additivity="false">
             <AppenderRef ref="Console-Appender"/>
         </Logger>
-        <Root level="info">
+        <Root level="error">
             <AppenderRef ref="Console-Appender"/>
         </Root>
     </Loggers>
