@@ -1,6 +1,8 @@
 package org.example.dao;
 
 import org.example.configuration.SessionFactoryUtil;
+import org.example.dto.TransportTypeDto;
+import org.example.dto.TransportTypeWithQualificationsDto;
 import org.example.entity.TransportType;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -96,6 +98,43 @@ public class TransportTypeDAO {
                 .getResultList();
             tx.commit();
             return list;
+        }
+    }
+
+    // DTO-based methods
+    public static List<TransportTypeDto> getAllDto() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "SELECT new org.example.dto.TransportTypeDto(tt.id, tt.name, tt.description) " +
+                "FROM TransportType tt",
+                TransportTypeDto.class
+            ).getResultList();
+        }
+    }
+
+    public static TransportTypeDto getByIdDto(Long id) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<TransportTypeDto> query = session.createQuery(
+                "SELECT new org.example.dto.TransportTypeDto(tt.id, tt.name, tt.description) " +
+                "FROM TransportType tt " +
+                "WHERE tt.id = :id",
+                TransportTypeDto.class
+            );
+            query.setParameter("id", id);
+            return query.uniqueResultOptional().orElse(null);
+        }
+    }
+
+    public static TransportTypeDto findByNameDto(String name) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<TransportTypeDto> query = session.createQuery(
+                "SELECT new org.example.dto.TransportTypeDto(tt.id, tt.name, tt.description) " +
+                "FROM TransportType tt " +
+                "WHERE tt.name = :name",
+                TransportTypeDto.class
+            );
+            query.setParameter("name", name);
+            return query.uniqueResultOptional().orElse(null);
         }
     }
 }

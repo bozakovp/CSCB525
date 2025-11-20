@@ -2,6 +2,7 @@ package org.example.dao;
 
 import org.example.configuration.SessionFactoryUtil;
 import org.example.dto.TransportCompanyDto;
+import org.example.dto.CompanyRevenueDto;
 import org.example.entity.TransportCompany;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -59,6 +60,32 @@ public class TransportCompanyDAO {
                 "SELECT new org.example.dto.TransportCompanyDto(c.id, c.name) " +
                 "FROM TransportCompany c",
                 TransportCompanyDto.class
+            ).getResultList();
+        }
+    }
+
+    public static List<TransportCompanyDto> getCompaniesDtoOrderedByName() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "SELECT new org.example.dto.TransportCompanyDto(c.id, c.name) " +
+                "FROM TransportCompany c " +
+                "ORDER BY c.name ASC",
+                TransportCompanyDto.class
+            ).getResultList();
+        }
+    }
+
+    public static List<CompanyRevenueDto> getCompaniesDtoOrderedByRevenue() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "SELECT new org.example.dto.CompanyRevenueDto(" +
+                "c.id, c.name, COUNT(t), COALESCE(SUM(t.price), 0)) " +
+                "FROM TransportCompany c " +
+                "LEFT JOIN c.employees e " +
+                "LEFT JOIN e.transports t " +
+                "GROUP BY c.id, c.name " +
+                "ORDER BY COALESCE(SUM(t.price), 0) DESC",
+                CompanyRevenueDto.class
             ).getResultList();
         }
     }

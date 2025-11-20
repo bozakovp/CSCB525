@@ -11,6 +11,11 @@ import org.example.dto.TransportDto;
 import org.example.dto.TransportCompanyDto;
 import org.example.dto.TransportEmployeeDto;
 import org.example.dto.VehicleDto;
+import org.example.dto.TransportTypeDto;
+import org.example.dto.QualificationDto;
+import org.example.dto.DriverTransportCountDto;
+import org.example.dto.CompanyRevenueDto;
+import org.example.dto.DriverRevenueDto;
 import org.example.entity.Transport;
 import org.example.entity.TransportCompany;
 import org.example.entity.TransportEmployee;
@@ -71,7 +76,7 @@ public class Main {
         System.out.println("4 - Employees");
         System.out.println("5 - Vehicles");
         System.out.println("6 - Transports");
-        System.out.println("7 - Export Transports to CSV");
+        System.out.println("7 - Reports");
         System.out.println("q - Quit");
         System.out.print("Enter option: ");
     }
@@ -84,7 +89,7 @@ public class Main {
             case "4" -> employeeMenu(reader);
             case "5" -> vehicleMenu(reader);
             case "6" -> transportMenu(reader);
-            case "7" -> exportTransports(reader);
+            case "7" -> reportsMenu(reader);
             default -> System.out.println("Invalid option");
         }
     }
@@ -95,9 +100,11 @@ public class Main {
         while (inSubmenu) {
             System.out.println("\n--- Companies Menu ---");
             System.out.println("1 - Create company");
-            System.out.println("2 - Edit company");
-            System.out.println("3 - Delete company");
-            System.out.println("4 - List all companies");
+            System.out.println("2 - List all companies");
+            System.out.println("3 - Edit company");
+            System.out.println("4 - Delete company");
+            System.out.println("5 - Order companies by name");
+            System.out.println("6 - Order companies by revenue");
             System.out.println("b - Back to main menu");
             System.out.print("Enter option: ");
             System.out.flush();
@@ -112,9 +119,11 @@ public class Main {
             try {
                 switch (input) {
                     case "1" -> createCompany(reader);
-                    case "2" -> editCompany(reader);
-                    case "3" -> deleteCompany(reader);
-                    case "4" -> listCompanies();
+                    case "2" -> listCompanies();
+                    case "3" -> editCompany(reader);
+                    case "4" -> deleteCompany(reader);
+                    case "5" -> listCompaniesByName();
+                    case "6" -> listCompaniesByRevenue();
                     case "b" -> inSubmenu = false;
                     default -> System.out.println("Invalid option");
                 }
@@ -131,9 +140,9 @@ public class Main {
         while (inSubmenu) {
             System.out.println("\n--- Qualifications Menu ---");
             System.out.println("1 - Create qualification");
-            System.out.println("2 - Edit qualification");
-            System.out.println("3 - Delete qualification");
-            System.out.println("4 - List all qualifications");
+            System.out.println("2 - List all qualifications");
+            System.out.println("3 - Edit qualification");
+            System.out.println("4 - Delete qualification");
             System.out.println("b - Back to main menu");
             System.out.print("Enter option: ");
             System.out.flush();
@@ -148,9 +157,9 @@ public class Main {
             try {
                 switch (input) {
                     case "1" -> createQualification(reader);
-                    case "2" -> editQualification(reader);
-                    case "3" -> deleteQualification(reader);
-                    case "4" -> listQualifications();
+                    case "2" -> listQualifications();
+                    case "3" -> editQualification(reader);
+                    case "4" -> deleteQualification(reader);
                     case "b" -> inSubmenu = false;
                     default -> System.out.println("Invalid option");
                 }
@@ -167,9 +176,9 @@ public class Main {
         while (inSubmenu) {
             System.out.println("\n--- Vehicles Menu ---");
             System.out.println("1 - Create vehicle");
-            System.out.println("2 - Edit vehicle");
-            System.out.println("3 - Delete vehicle");
-            System.out.println("4 - List vehicles by company");
+            System.out.println("2 - List vehicles by company");
+            System.out.println("3 - Edit vehicle");
+            System.out.println("4 - Delete vehicle");
             System.out.println("b - Back to main menu");
             System.out.print("Enter option: ");
             System.out.flush();
@@ -184,9 +193,9 @@ public class Main {
             try {
                 switch (input) {
                     case "1" -> createVehicle(reader);
-                    case "2" -> editVehicle(reader);
-                    case "3" -> deleteVehicle(reader);
-                    case "4" -> listVehiclesByCompany(reader);
+                    case "2" -> listVehiclesByCompany(reader);
+                    case "3" -> editVehicle(reader);
+                    case "4" -> deleteVehicle(reader);
                     case "b" -> inSubmenu = false;
                     default -> System.out.println("Invalid option");
                 }
@@ -203,10 +212,12 @@ public class Main {
         while (inSubmenu) {
             System.out.println("\n--- Employees Menu ---");
             System.out.println("1 - Create employee");
-            System.out.println("2 - Edit employee");
-            System.out.println("3 - Delete employee");
-            System.out.println("4 - List employees by company");
+            System.out.println("2 - List employees by company");
+            System.out.println("3 - Edit employee");
+            System.out.println("4 - Delete employee");
             System.out.println("5 - Manage employee qualifications");
+            System.out.println("6 - Order employees by qualifications count");
+            System.out.println("7 - Order employees by revenue created");
             System.out.println("b - Back to main menu");
             System.out.print("Enter option: ");
             System.out.flush();
@@ -221,10 +232,12 @@ public class Main {
             try {
                 switch (input) {
                     case "1" -> createEmployee(reader);
-                    case "2" -> editEmployee(reader);
-                    case "3" -> deleteEmployee(reader);
-                    case "4" -> listEmployeesByCompany(reader);
+                    case "2" -> listEmployeesByCompany(reader);
+                    case "3" -> editEmployee(reader);
+                    case "4" -> deleteEmployee(reader);
                     case "5" -> manageEmployeeQualifications(reader);
+                    case "6" -> listEmployeesOrderedByQualifications();
+                    case "7" -> listEmployeesOrderedByRevenue();
                     case "b" -> inSubmenu = false;
                     default -> System.out.println("Invalid option");
                 }
@@ -240,8 +253,8 @@ public class Main {
         boolean inSubmenu = true;
         while (inSubmenu) {
             System.out.println("\n--- Transport Types Menu ---");
-            System.out.println("1 - List transport types");
-            System.out.println("2 - Create transport type");
+            System.out.println("1 - Create transport type");
+            System.out.println("2 - List transport types");
             System.out.println("3 - Edit transport type");
             System.out.println("4 - Delete transport type");
             System.out.println("b - Back to main menu");
@@ -257,8 +270,8 @@ public class Main {
             
             try {
                 switch (input) {
-                    case "1" -> listTransportTypes();
-                    case "2" -> createTransportType(reader);
+                    case "1" -> createTransportType(reader);
+                    case "2" -> listTransportTypes();
                     case "3" -> editTransportType(reader);
                     case "4" -> deleteTransportType(reader);
                     case "b" -> inSubmenu = false;
@@ -278,6 +291,7 @@ public class Main {
             System.out.println("\n--- Transports Menu ---");
             System.out.println("1 - Create transport");
             System.out.println("2 - List transports by destination");
+            System.out.println("3 - Order transports by destination");
             System.out.println("b - Back to main menu");
             System.out.print("Enter option: ");
             System.out.flush();
@@ -293,6 +307,7 @@ public class Main {
                 switch (input) {
                     case "1" -> createTransport(reader);
                     case "2" -> listTransportsByDestination(reader);
+                    case "3" -> listTransportsOrderedByDestination();
                     case "b" -> inSubmenu = false;
                     default -> System.out.println("Invalid option");
                 }
@@ -349,10 +364,31 @@ public class Main {
         companies.forEach(c -> System.out.println(c.getId() + " - " + c.getName()));
     }
 
+    private static void listCompaniesByName() {
+        List<org.example.dto.TransportCompanyDto> companies = TransportCompanyDAO.getCompaniesDtoOrderedByName();
+        if (companies.isEmpty()) {
+            System.out.println("No companies found");
+            return;
+        }
+        System.out.println("\n=== Companies Ordered by Name ===");
+        companies.forEach(c -> System.out.println(c.getId() + " - " + c.getName()));
+    }
+
+    private static void listCompaniesByRevenue() {
+        List<org.example.dto.CompanyRevenueDto> companies = TransportCompanyDAO.getCompaniesDtoOrderedByRevenue();
+        if (companies.isEmpty()) {
+            System.out.println("No companies found");
+            return;
+        }
+        System.out.println("\n=== Companies Ordered by Revenue (highest to lowest) ===");
+        companies.forEach(c -> System.out.println(c.getCompanyId() + " - " + c.getCompanyName() + 
+                " (Transports: " + c.getTransportCount() + ", Revenue: $" + c.getTotalRevenue() + ")"));
+    }
+
     // Vehicle handlers
     private static void createVehicle(BufferedReader reader) throws IOException {
         // Check if transport types exist
-        List<TransportType> types = TransportTypeDAO.getAll();
+        List<TransportTypeDto> types = TransportTypeDAO.getAllDto();
         if (types.isEmpty()) {
             System.out.println("Cannot create vehicle: No transport types exist in database.");
             System.out.println("Please create transport types first (Main Menu -> Transport Types).");
@@ -368,7 +404,7 @@ public class Main {
                 ((t.getDescription() != null && !t.getDescription().isBlank()) ? (" (" + t.getDescription() + ")") : "")));
         
         long typeId = readId(reader, "Select transport type ID: ");
-        TransportType selectedType = TransportTypeDAO.getById(typeId);
+        TransportTypeDto selectedType = TransportTypeDAO.getByIdDto(typeId);
         if (selectedType == null) {
             System.out.println("Transport type not found");
             return;
@@ -411,7 +447,7 @@ public class Main {
     // Employee handlers
     private static void createEmployee(BufferedReader reader) throws IOException {
         // Check if qualifications exist
-        List<Qualification> qualifications = QualificationDAO.getQualifications();
+        List<QualificationDto> qualifications = QualificationDAO.getQualificationsDto();
         if (qualifications.isEmpty()) {
             System.out.println("Cannot create employee: No qualifications exist in database.");
             System.out.println("Please create qualifications first (Main Menu -> Qualifications).");
@@ -459,6 +495,27 @@ public class Main {
         employees.forEach(e -> System.out.println(e.getId() + " - " + e.getName()));
     }
 
+    private static void listEmployeesOrderedByQualifications() {
+        List<org.example.dto.TransportEmployeeDto> employees = EmployeeDAO.getEmployeesDtoOrderedByQualifications();
+        if (employees.isEmpty()) {
+            System.out.println("No employees found");
+            return;
+        }
+        System.out.println("\n=== Employees Ordered by Qualifications Count (highest to lowest) ===");
+        employees.forEach(e -> System.out.println(e.getId() + " - " + e.getName() + " (" + e.getCompanyName() + ")"));
+    }
+
+    private static void listEmployeesOrderedByRevenue() {
+        List<org.example.dto.DriverRevenueDto> employees = EmployeeDAO.getEmployeesDtoOrderedByRevenue();
+        if (employees.isEmpty()) {
+            System.out.println("No employees found");
+            return;
+        }
+        System.out.println("\n=== Employees Ordered by Revenue Created (highest to lowest) ===");
+        employees.forEach(e -> System.out.println(e.getDriverId() + " - " + e.getDriverName() + 
+                " (" + e.getCompanyName() + ", Transports: " + e.getTransportCount() + ", Revenue: $" + e.getTotalRevenue() + ")"));
+    }
+
     // Transport handlers
     private static void createTransport(BufferedReader reader) throws IOException {
         long vehicleId = readId(reader, "Vehicle id: ");
@@ -497,7 +554,7 @@ public class Main {
         TransportType tt = TransportTypeDAO.findByNameWithQualifications(vehicle.getType());
         if (tt == null) {
             System.out.println("No TransportType found matching vehicle type '" + vehicle.getType() + "'.");
-            List<TransportType> allTypes = TransportTypeDAO.getAll();
+            List<TransportTypeDto> allTypes = TransportTypeDAO.getAllDto();
             if (allTypes.isEmpty()) {
                 System.out.println("No TransportTypes exist. Please create transport types in the database first.");
                 return;
@@ -560,6 +617,17 @@ public class Main {
                 " Date: " + t.getDepartureDate() + " Driver: " + t.getDriverName()));
     }
 
+    private static void listTransportsOrderedByDestination() {
+        List<org.example.dto.TransportDto> transports = TransportDAO.getTransportsDtoOrderedByDestination();
+        if (transports.isEmpty()) {
+            System.out.println("No transports found");
+            return;
+        }
+        System.out.println("\n=== Transports Ordered by Destination ===");
+        transports.forEach(t -> System.out.println(t.getId() + " - From: " + t.getStartPoint() + " To: " + t.getEndPoint() +
+                " Date: " + t.getDepartureDate() + " Driver: " + t.getDriverName()));
+    }
+
     private static void exportTransports(BufferedReader reader) throws IOException {
         long companyId = readId(reader, "Company id: ");
         System.out.print("Enter file name (e.g., transports.csv): ");
@@ -588,7 +656,7 @@ public class Main {
 
     // TransportType handlers
     private static void listTransportTypes() {
-        List<TransportType> types = TransportTypeDAO.getAll();
+        List<TransportTypeDto> types = TransportTypeDAO.getAllDto();
         if (types.isEmpty()) {
             System.out.println("No transport types found");
             return;
@@ -602,7 +670,7 @@ public class Main {
         System.out.flush();
         String name = reader.readLine().trim();
         if (name.isEmpty()) { System.out.println("Name is required"); return; }
-        TransportType existing = TransportTypeDAO.findByName(name);
+        TransportTypeDto existing = TransportTypeDAO.findByNameDto(name);
         if (existing != null) { System.out.println("Type already exists with id: " + existing.getId()); return; }
         System.out.print("Description (optional): ");
         System.out.flush();
@@ -622,7 +690,7 @@ public class Main {
         System.out.flush();
         String name = reader.readLine().trim();
         if (!name.isEmpty()) {
-            TransportType dup = TransportTypeDAO.findByName(name);
+            TransportTypeDto dup = TransportTypeDAO.findByNameDto(name);
             if (dup != null && dup.getId() != type.getId()) { System.out.println("Another type with that name exists"); return; }
             type.setName(name);
         }
@@ -645,7 +713,7 @@ public class Main {
 
     // Qualification handlers
     private static void listQualifications() {
-        List<Qualification> qualifications = QualificationDAO.getQualifications();
+        List<QualificationDto> qualifications = QualificationDAO.getQualificationsDto();
         if (qualifications.isEmpty()) {
             System.out.println("No qualifications found");
             return;
@@ -731,7 +799,7 @@ public class Main {
     }
 
     private static void addQualificationToEmployee(BufferedReader reader, long employeeId) throws IOException {
-        List<Qualification> qualifications = QualificationDAO.getQualifications();
+        List<QualificationDto> qualifications = QualificationDAO.getQualificationsDto();
         if (qualifications.isEmpty()) {
             System.out.println("No qualifications available. Please create qualifications first.");
             return;
@@ -741,7 +809,7 @@ public class Main {
         qualifications.forEach(q -> System.out.println(q.getId() + " - " + q.getName()));
         
         long qualId = readId(reader, "Select qualification id to add: ");
-        Qualification qual = QualificationDAO.getQualificationById(qualId);
+        QualificationDto qual = QualificationDAO.getQualificationByIdDto(qualId);
         if (qual == null) {
             System.out.println("Qualification not found");
             return;
@@ -778,4 +846,134 @@ public class Main {
             System.out.println("Warning: Please enter a valid number.");
         }
     }
+
+    // Reports Menu
+    private static void reportsMenu(BufferedReader reader) throws IOException {
+        boolean inSubmenu = true;
+        while (inSubmenu) {
+            System.out.println("\n--- Reports Menu ---");
+            System.out.println("1 - Total transports count");
+            System.out.println("2 - Total revenue from all transports");
+            System.out.println("3 - Transports per driver report");
+            System.out.println("4 - Company revenue for period");
+            System.out.println("5 - Revenue per driver report");
+            System.out.println("6 - Export transports to CSV");
+            System.out.println("b - Back to main menu");
+            System.out.print("Enter option: ");
+            System.out.flush();
+
+            String input = reader.readLine();
+            if (input == null) {
+                System.out.println("End of input stream detected, exiting.");
+                return;
+            }
+            input = input.trim();
+
+            try {
+                switch (input) {
+                    case "1" -> reportTotalTransports();
+                    case "2" -> reportTotalRevenue();
+                    case "3" -> reportTransportsPerDriver();
+                    case "4" -> reportCompanyRevenueForPeriod(reader);
+                    case "5" -> reportRevenuePerDriver();
+                    case "6" -> exportTransports(reader);
+                    case "b" -> inSubmenu = false;
+                    default -> System.out.println("Invalid option");
+                }
+            } catch (Exception e) {
+                System.err.println("Error generating report: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Report: Total number of transports
+    private static void reportTotalTransports() {
+        Long count = TransportDAO.getTotalTransportsCount();
+        System.out.println("\n=== Total Transports Report ===");
+        System.out.println("Total transports: " + count);
+    }
+
+    // Report: Total revenue from all transports
+    private static void reportTotalRevenue() {
+        BigDecimal total = TransportDAO.getTotalRevenue();
+        System.out.println("\n=== Total Revenue Report ===");
+        System.out.println("Total revenue: $" + total);
+    }
+
+    // Report: List of drivers and how many transports each has completed
+    private static void reportTransportsPerDriver() {
+        List<DriverTransportCountDto> results = TransportDAO.getTransportsPerDriver();
+
+        System.out.println("\n=== Transports Per Driver Report ===");
+        System.out.printf("%-10s %-30s %s%n", "Driver ID", "Driver Name", "Transport Count");
+        System.out.println("=".repeat(60));
+        
+        for (DriverTransportCountDto dto : results) {
+            System.out.printf("%-10d %-30s %d%n", dto.getDriverId(), dto.getDriverName(), dto.getTransportCount());
+        }
+        
+        if (results.isEmpty()) {
+            System.out.println("No transports found.");
+        }
+    }
+
+    // Report: Company revenue for a specific time period
+    private static void reportCompanyRevenueForPeriod(BufferedReader reader) throws IOException {
+        System.out.print("Enter start date (yyyy-MM-dd HH:mm): ");
+        String startStr = reader.readLine();
+        System.out.print("Enter end date (yyyy-MM-dd HH:mm): ");
+        String endStr = reader.readLine();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime startDate = LocalDateTime.parse(startStr, formatter);
+        LocalDateTime endDate = LocalDateTime.parse(endStr, formatter);
+
+        List<CompanyRevenueDto> results = TransportDAO.getCompanyRevenueForPeriod(startDate, endDate);
+
+        System.out.println("\n=== Company Revenue Report ===");
+        System.out.println("Period: " + startDate + " to " + endDate);
+        System.out.printf("%-12s %-30s %-15s %s%n", "Company ID", "Company Name", "Transports", "Revenue");
+        System.out.println("=".repeat(80));
+        
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+        for (CompanyRevenueDto dto : results) {
+            totalRevenue = totalRevenue.add(dto.getTotalRevenue());
+            System.out.printf("%-12d %-30s %-15d $%.2f%n", 
+                dto.getCompanyId(), dto.getCompanyName(), dto.getTransportCount(), dto.getTotalRevenue());
+        }
+        
+        if (!results.isEmpty()) {
+            System.out.println("=".repeat(80));
+            System.out.printf("%-58s $%.2f%n", "TOTAL:", totalRevenue);
+        } else {
+            System.out.println("No transports found in this period.");
+        }
+    }
+
+    // Report: Revenue per driver
+    private static void reportRevenuePerDriver() {
+        List<DriverRevenueDto> results = TransportDAO.getRevenuePerDriver();
+
+        System.out.println("\n=== Revenue Per Driver Report ===");
+        System.out.printf("%-10s %-25s %-25s %-12s %s%n", 
+                "Driver ID", "Driver Name", "Company", "Transports", "Revenue");
+        System.out.println("=".repeat(100));
+        
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+        for (DriverRevenueDto dto : results) {
+            totalRevenue = totalRevenue.add(dto.getTotalRevenue());
+            System.out.printf("%-10d %-25s %-25s %-12d $%.2f%n", 
+                    dto.getDriverId(), dto.getDriverName(), dto.getCompanyName(), 
+                    dto.getTransportCount(), dto.getTotalRevenue());
+        }
+        
+        if (!results.isEmpty()) {
+            System.out.println("=".repeat(100));
+            System.out.printf("%-73s $%.2f%n", "TOTAL:", totalRevenue);
+        } else {
+            System.out.println("No transports found.");
+        }
+    }
+
 }

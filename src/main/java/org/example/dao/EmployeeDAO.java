@@ -3,6 +3,7 @@ package org.example.dao;
 import org.example.configuration.SessionFactoryUtil;
 import org.example.dto.TransportEmployeeDto;
 import org.example.dto.TransportEmployeeWithQualificationsDto;
+import org.example.dto.DriverRevenueDto;
 import org.example.entity.TransportEmployee;
 import org.example.entity.Qualification;
 import org.hibernate.Session;
@@ -175,6 +176,34 @@ public class EmployeeDAO {
             );
             query.setParameter("companyId", companyId);
             return query.getResultList();
+        }
+    }
+
+    public static List<TransportEmployeeDto> getEmployeesDtoOrderedByQualifications() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "SELECT new org.example.dto.TransportEmployeeDto(" +
+                "e.id, e.name, e.company.id, e.company.name) " +
+                "FROM TransportEmployee e " +
+                "LEFT JOIN e.qualifications q " +
+                "GROUP BY e.id, e.name, e.company.id, e.company.name " +
+                "ORDER BY COUNT(q) DESC",
+                TransportEmployeeDto.class
+            ).getResultList();
+        }
+    }
+
+    public static List<DriverRevenueDto> getEmployeesDtoOrderedByRevenue() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "SELECT new org.example.dto.DriverRevenueDto(" +
+                "e.id, e.name, e.company.name, COUNT(t), COALESCE(SUM(t.price), 0)) " +
+                "FROM TransportEmployee e " +
+                "LEFT JOIN e.transports t " +
+                "GROUP BY e.id, e.name, e.company.name " +
+                "ORDER BY COALESCE(SUM(t.price), 0) DESC",
+                DriverRevenueDto.class
+            ).getResultList();
         }
     }
 }

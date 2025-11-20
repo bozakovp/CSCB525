@@ -1,10 +1,12 @@
 package org.example.dao;
 
 import org.example.configuration.SessionFactoryUtil;
+import org.example.dto.QualificationDto;
 import org.example.entity.Qualification;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 // Simple static DAO for managing qualifications (keeps pattern consistent with other DAOs)
 public class QualificationDAO {
@@ -48,6 +50,30 @@ public class QualificationDAO {
             Transaction tx = session.beginTransaction();
             session.delete(qualification);
             tx.commit();
+        }
+    }
+
+    // DTO-based methods
+    public static List<QualificationDto> getQualificationsDto() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "SELECT new org.example.dto.QualificationDto(q.id, q.name, q.description) " +
+                "FROM Qualification q",
+                QualificationDto.class
+            ).getResultList();
+        }
+    }
+
+    public static QualificationDto getQualificationByIdDto(Long id) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<QualificationDto> query = session.createQuery(
+                "SELECT new org.example.dto.QualificationDto(q.id, q.name, q.description) " +
+                "FROM Qualification q " +
+                "WHERE q.id = :id",
+                QualificationDto.class
+            );
+            query.setParameter("id", id);
+            return query.uniqueResultOptional().orElse(null);
         }
     }
 }

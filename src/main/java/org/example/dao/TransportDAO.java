@@ -2,6 +2,9 @@ package org.example.dao;
 
 import org.example.configuration.SessionFactoryUtil;
 import org.example.dto.TransportDto;
+import org.example.dto.DriverTransportCountDto;
+import org.example.dto.CompanyRevenueDto;
+import org.example.dto.DriverRevenueDto;
 import org.example.entity.Transport;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -9,8 +12,10 @@ import org.hibernate.query.Query;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TransportDAO {
@@ -89,6 +94,20 @@ public class TransportDAO {
         }
     }
 
+    public static List<TransportDto> getTransportsDtoOrderedByDestination() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "SELECT new org.example.dto.TransportDto(" +
+                "t.id, t.vehicle.id, t.vehicle.type, t.driver.id, t.driver.name, " +
+                "t.transportType.id, t.transportType.name, t.startPoint, t.endPoint, " +
+                "t.departureDate, t.arrivalDate, t.cargoWeight, t.price) " +
+                "FROM Transport t " +
+                "ORDER BY t.endPoint ASC",
+                TransportDto.class
+            ).getResultList();
+        }
+    }
+
     // Export DTOs to CSV file
     public static void exportTransportsDtoToCSV(List<TransportDto> transports, String fileName) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName))) {
@@ -112,4 +131,66 @@ public class TransportDAO {
             }
         }
     }
+
+    // Report methods
+    public static Long getTotalTransportsCount() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery("SELECT COUNT(t) FROM Transport t", Long.class)
+                    .getSingleResult();
+        }
+    }
+
+    public static BigDecimal getTotalRevenue() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "SELECT COALESCE(SUM(t.price), 0) FROM Transport t", BigDecimal.class)
+                    .getSingleResult();
+        }
+    }
+
+    public static List<DriverTransportCountDto> getTransportsPerDriver() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "SELECT new org.example.dto.DriverTransportCountDto(" +
+                    "t.driver.id, t.driver.name, COUNT(t)) " +
+                    "FROM Transport t " +
+                    "GROUP BY t.driver.id, t.driver.name " +
+                    "ORDER BY COUNT(t) DESC",
+                    DriverTransportCountDto.class
+            ).getResultList();
+        }
+    }
+
+    public static List<CompanyRevenueDto> getCompanyRevenueForPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "SELECT new org.example.dto.CompanyRevenueDto(" +
+                    "t.vehicle.company.id, t.vehicle.company.name, " +
+                    "COUNT(t), COALESCE(SUM(t.price), 0)) " +
+                    "FROM Transport t " +
+                    "WHERE t.departureDate BETWEEN :startDate AND :endDate " +
+                    "GROUP BY t.vehicle.company.id, t.vehicle.company.name " +
+                    "ORDER BY SUM(t.price) DESC",
+                    CompanyRevenueDto.class
+            )
+            .setParameter("startDate", startDate)
+            .setParameter("endDate", endDate)
+            .getResultList();
+        }
+    }
+
+    public static List<DriverRevenueDto> getRevenuePerDriver() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "SELECT new org.example.dto.DriverRevenueDto(" +
+                    "t.driver.id, t.driver.name, t.driver.company.name, " +
+                    "COUNT(t), COALESCE(SUM(t.price), 0)) " +
+                    "FROM Transport t " +
+                    "GROUP BY t.driver.id, t.driver.name, t.driver.company.name " +
+                    "ORDER BY SUM(t.price) DESC",
+                    DriverRevenueDto.class
+            ).getResultList();
+        }
+    }
+
 }
