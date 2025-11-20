@@ -1,6 +1,7 @@
 package org.example.dao;
 
 import org.example.configuration.SessionFactoryUtil;
+import org.example.dto.TransportCompanyDto;
 import org.example.entity.TransportCompany;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -29,16 +30,7 @@ public class TransportCompanyDAO {
         }
     }
 
-    public static List<TransportCompany> getCompanies() {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            List<TransportCompany> companies = session
-                    .createQuery("FROM TransportCompany", TransportCompany.class)
-                    .getResultList();
-            transaction.commit();
-            return companies;
-        }
-    }
+
 
     public static void updateCompany(TransportCompany company) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
@@ -56,68 +48,18 @@ public class TransportCompanyDAO {
         }
     }
 
-    public static List<TransportCompany> getCompaniesSortedByName(boolean ascending) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            String order = ascending ? "ASC" : "DESC";
-            List<TransportCompany> companies = session
-                    .createQuery("FROM TransportCompany ORDER BY name " + order, TransportCompany.class)
-                    .getResultList();
-            transaction.commit();
-            return companies;
-        }
-    }
 
-    public static List<TransportCompany> findByNamePattern(String pattern) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            Query<TransportCompany> query = session.createQuery(
-                "FROM TransportCompany WHERE name LIKE :pattern", 
-                TransportCompany.class
-            );
-            query.setParameter("pattern", "%" + pattern + "%");
-            List<TransportCompany> companies = query.getResultList();
-            transaction.commit();
-            return companies;
-        }
-    }
 
-    public static BigDecimal calculateCompanyRevenue(Long companyId, LocalDate startDate, LocalDate endDate) {
+
+
+    // DTO-based methods
+    public static List<TransportCompanyDto> getCompaniesDto() {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            String hql = """
-                SELECT COALESCE(SUM(t.price), 0)
-                FROM Transport t
-                JOIN t.vehicle v
-                WHERE v.company.id = :companyId
-                AND t.departureDate >= :startDate
-                AND t.departureDate <= :endDate
-                """;
-            Query<BigDecimal> query = session.createQuery(hql, BigDecimal.class);
-            query.setParameter("companyId", companyId);
-            query.setParameter("startDate", startDate.atStartOfDay());
-            query.setParameter("endDate", endDate.plusDays(1).atStartOfDay());
-            BigDecimal revenue = query.getSingleResult();
-            transaction.commit();
-            return revenue;
+            return session.createQuery(
+                "SELECT new org.example.dto.TransportCompanyDto(c.id, c.name) " +
+                "FROM TransportCompany c",
+                TransportCompanyDto.class
+            ).getResultList();
         }
     }
 }
-
-/*
-Usage Examples:
-// Create a company
-TransportCompany company = new TransportCompany();
-company.setName("Fast Logistics");
-TransportCompanyDAO.saveCompany(company);
-
-// Find companies by name
-List<TransportCompany> companies = TransportCompanyDAO.findByNamePattern("Fast");
-
-// Calculate revenue
-BigDecimal revenue = TransportCompanyDAO.calculateCompanyRevenue(
-    company.getId(), 
-    LocalDate.now().minusMonths(1), 
-    LocalDate.now()
-);
-*/

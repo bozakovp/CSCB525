@@ -7,6 +7,10 @@ import org.example.dao.VehicleDAO;
 import org.example.dao.TransportDAO;
 import org.example.dao.TransportTypeDAO;
 import org.example.dao.QualificationDAO;
+import org.example.dto.TransportDto;
+import org.example.dto.TransportCompanyDto;
+import org.example.dto.TransportEmployeeDto;
+import org.example.dto.VehicleDto;
 import org.example.entity.Transport;
 import org.example.entity.TransportCompany;
 import org.example.entity.TransportEmployee;
@@ -337,7 +341,7 @@ public class Main {
     }
 
     private static void listCompanies() {
-        List<TransportCompany> companies = TransportCompanyDAO.getCompanies();
+        List<org.example.dto.TransportCompanyDto> companies = TransportCompanyDAO.getCompaniesDto();
         if (companies.isEmpty()) {
             System.out.println("No companies found");
             return;
@@ -399,7 +403,7 @@ public class Main {
 
     private static void listVehiclesByCompany(BufferedReader reader) throws IOException {
         long companyId = readId(reader, "Company id: ");
-        List<Vehicle> vehicles = VehicleDAO.getVehiclesByCompany(companyId);
+        List<org.example.dto.VehicleDto> vehicles = VehicleDAO.getVehiclesByCompanyDto(companyId);
         if (vehicles.isEmpty()) { System.out.println("No vehicles found"); return; }
         vehicles.forEach(v -> System.out.println(v.getId() + " - " + v.getType()));
     }
@@ -450,7 +454,7 @@ public class Main {
 
     private static void listEmployeesByCompany(BufferedReader reader) throws IOException {
         long companyId = readId(reader, "Company id: ");
-        List<TransportEmployee> employees = EmployeeDAO.getEmployeesByCompany(companyId);
+        List<org.example.dto.TransportEmployeeDto> employees = EmployeeDAO.getEmployeesByCompanyDto(companyId);
         if (employees.isEmpty()) { System.out.println("No employees found"); return; }
         employees.forEach(e -> System.out.println(e.getId() + " - " + e.getName()));
     }
@@ -550,18 +554,30 @@ public class Main {
         System.out.print("Destination: ");
         System.out.flush();
         String destination = reader.readLine().trim();
-        List<Transport> transports = TransportDAO.getTransportsByDestination(destination);
+        List<org.example.dto.TransportDto> transports = TransportDAO.getTransportsByDestinationDto(destination);
         if (transports.isEmpty()) { System.out.println("No transports found"); return; }
         transports.forEach(t -> System.out.println(t.getId() + " - From: " + t.getStartPoint() + " To: " + t.getEndPoint() +
-                " Date: " + t.getDepartureDate() + " Driver: " + t.getDriver().getName()));
+                " Date: " + t.getDepartureDate() + " Driver: " + t.getDriverName()));
     }
 
     private static void exportTransports(BufferedReader reader) throws IOException {
         long companyId = readId(reader, "Company id: ");
-        List<Transport> transports = TransportDAO.getTransportsByCompany(companyId);
-        if (transports.isEmpty()) { System.out.println("No transports found"); return; }
-        TransportDAO.exportTransportsToCSV(transports, "transports.csv");
-        System.out.println("Exported transports to transports.csv");
+        System.out.print("Enter file name (e.g., transports.csv): ");
+        String fileName = reader.readLine();
+        
+        List<TransportDto> transports = TransportDAO.getTransportsByCompanyDto(companyId);
+        
+        if (transports.isEmpty()) {
+            System.out.println("No transports found for company ID: " + companyId);
+            return;
+        }
+        
+        try {
+            TransportDAO.exportTransportsDtoToCSV(transports, fileName);
+            System.out.println("Successfully exported " + transports.size() + " transports to " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error exporting transports: " + e.getMessage());
+        }
     }
 
     // TransportType handlers

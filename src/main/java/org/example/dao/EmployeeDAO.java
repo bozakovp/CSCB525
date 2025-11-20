@@ -1,6 +1,8 @@
 package org.example.dao;
 
 import org.example.configuration.SessionFactoryUtil;
+import org.example.dto.TransportEmployeeDto;
+import org.example.dto.TransportEmployeeWithQualificationsDto;
 import org.example.entity.TransportEmployee;
 import org.example.entity.Qualification;
 import org.hibernate.Session;
@@ -44,16 +46,7 @@ public class EmployeeDAO {
         }
     }
 
-    public static List<TransportEmployee> getEmployees() {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            List<TransportEmployee> employees = session
-                    .createQuery("FROM TransportEmployee", TransportEmployee.class)
-                    .getResultList();
-            transaction.commit();
-            return employees;
-        }
-    }
+
 
     public static void updateEmployee(TransportEmployee employee) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
@@ -71,35 +64,9 @@ public class EmployeeDAO {
         }
     }
 
-    public static List<TransportEmployee> getEmployeesByCompany(Long companyId) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            Query<TransportEmployee> query = session.createQuery(
-                "FROM TransportEmployee WHERE company.id = :companyId", 
-                TransportEmployee.class
-            );
-            query.setParameter("companyId", companyId);
-            List<TransportEmployee> employees = query.getResultList();
-            transaction.commit();
-            return employees;
-        }
-    }
 
-    public static List<TransportEmployee> getEmployeesByQualification(Long qualificationId) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            Query<TransportEmployee> query = session.createQuery(
-                "SELECT DISTINCT e FROM TransportEmployee e " +
-                "JOIN e.qualifications q " +
-                "WHERE q.id = :qualificationId",
-                TransportEmployee.class
-            );
-            query.setParameter("qualificationId", qualificationId);
-            List<TransportEmployee> employees = query.getResultList();
-            transaction.commit();
-            return employees;
-        }
-    }
+
+
 
     public static void addQualificationToEmployee(Long employeeId, Long qualificationId) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
@@ -133,42 +100,12 @@ public class EmployeeDAO {
         }
     }
 
-    /**
-     * Overloaded method for backward compatibility.
-     * Finds all available drivers for a given time period without qualification filtering or pagination.
-     */
+    // Overloaded method for backward compatibility - finds all available drivers for a given time period without qualification filtering or pagination
     public static List<TransportEmployee> getAvailableDrivers(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
         return getAvailableDrivers(startDate, endDate, null, null);
     }
 
-    public static List<TransportEmployee> searchEmployeesByName(String namePattern) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            Query<TransportEmployee> query = session.createQuery(
-                "FROM TransportEmployee WHERE name LIKE :pattern",
-                TransportEmployee.class
-            );
-            query.setParameter("pattern", "%" + namePattern + "%");
-            List<TransportEmployee> employees = query.getResultList();
-            transaction.commit();
-            return employees;
-        }
-    }
-
-    /**
-     * Find available drivers for a given time period who have appropriate qualifications.
-     * This method checks:
-     * 1. Driver is not assigned to any transport during the specified period
-     * 2. Driver has valid qualifications
-     * 3. Driver belongs to an active company
-     *
-     * @param startDate The start date-time of the period (inclusive)
-     * @param endDate The end date-time of the period (inclusive)
-     * @param requiredQualificationId Optional qualification ID that the driver must have
-     * @param maxResults Maximum number of results to return (for pagination)
-     * @return List of available drivers
-     * @throws IllegalArgumentException if startDate is after endDate or dates are null
-     */
+    // Find available drivers for a given time period who have appropriate qualifications - checks if driver is not assigned to any transport during the period and has valid qualifications
     public static List<TransportEmployee> getAvailableDrivers(
             java.time.LocalDateTime startDate,
             java.time.LocalDateTime endDate,
@@ -189,8 +126,7 @@ public class EmployeeDAO {
             String hql = """
                 SELECT DISTINCT e FROM TransportEmployee e
                 LEFT JOIN e.qualifications q
-                WHERE e.company.active = true
-                AND e NOT IN (
+                WHERE e NOT IN (
                     SELECT DISTINCT t.driver
                     FROM Transport t
                     WHERE (
@@ -226,28 +162,19 @@ public class EmployeeDAO {
             return availableDrivers;
         }
     }
+
+    // DTO-based methods
+    public static List<TransportEmployeeDto> getEmployeesByCompanyDto(Long companyId) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<TransportEmployeeDto> query = session.createQuery(
+                "SELECT new org.example.dto.TransportEmployeeDto(" +
+                "e.id, e.name, e.company.id, e.company.name) " +
+                "FROM TransportEmployee e " +
+                "WHERE e.company.id = :companyId",
+                TransportEmployeeDto.class
+            );
+            query.setParameter("companyId", companyId);
+            return query.getResultList();
+        }
+    }
 }
-
-/*
-Example usage:
-// Create a new employee
-TransportEmployee employee = new TransportEmployee();
-employee.setName("John Doe");
-employee.setCompany(company);  // company is a TransportCompany instance
-EmployeeDAO.saveEmployee(employee);
-
-// Add qualification to employee
-EmployeeDAO.addQualificationToEmployee(employee.getId(), qualificationId);
-
-// Find employees by company
-List<TransportEmployee> companyEmployees = EmployeeDAO.getEmployeesByCompany(company.getId());
-
-// Search employees by name
-List<TransportEmployee> searchResults = EmployeeDAO.searchEmployeesByName("John");
-
-// Find available drivers for a transport
-List<TransportEmployee> availableDrivers = EmployeeDAO.getAvailableDrivers(
-    LocalDateTime.now(),
-    LocalDateTime.now().plusDays(1)
-);
-*/
