@@ -563,7 +563,13 @@ public class Main {
     private static void exportTransports(BufferedReader reader) throws IOException {
         long companyId = readId(reader, "Company id: ");
         System.out.print("Enter file name (e.g., transports.csv): ");
-        String fileName = reader.readLine();
+        String fileName = reader.readLine().trim();
+        
+        // Use default filename if empty
+        if (fileName.isEmpty()) {
+            fileName = "transports_company_" + companyId + ".csv";
+            System.out.println("Using default filename: " + fileName);
+        }
         
         List<TransportDto> transports = TransportDAO.getTransportsByCompanyDto(companyId);
         
